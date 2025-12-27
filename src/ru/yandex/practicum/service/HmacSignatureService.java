@@ -1,11 +1,12 @@
 package ru.yandex.practicum.service;
 
+import ru.yandex.practicum.util.Base64UrlCodec;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.Base64;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class HmacSignatureService implements SignatureService {
@@ -20,6 +21,7 @@ public class HmacSignatureService implements SignatureService {
         if (key == null || key.length == 0) {
             throw new IllegalArgumentException("key is empty");
         }
+
         this.algorithm = algorithm;
         this.key = key.clone();
     }
@@ -30,7 +32,7 @@ public class HmacSignatureService implements SignatureService {
             macInstance.init(new SecretKeySpec(key, algorithm));
             return macInstance;
         } catch (NoSuchAlgorithmException | InvalidKeyException exception) {
-            throw new IllegalStateException("Unable to initialize Mac", exception);
+            throw new IllegalStateException("unable to initialize Mac", exception);
         }
     }
 
@@ -39,17 +41,19 @@ public class HmacSignatureService implements SignatureService {
         return macInstance.doFinal(message.getBytes(StandardCharsets.UTF_8));
     }
 
+    @Override
     public String sign(String message) {
         byte[] signatureBytes = signBytes(message);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(signatureBytes);
+        return Base64UrlCodec.encode(signatureBytes);
     }
 
+    @Override
     public boolean verify(String message, String signature) {
         byte[] expectedSignatureBytes = signBytes(message);
         byte[] providedSignatureBytes;
 
         try {
-            providedSignatureBytes = Base64.getUrlDecoder().decode(signature);
+            providedSignatureBytes = Base64UrlCodec.decode(signature);
         } catch (IllegalArgumentException exception) {
             return false;
         }

@@ -1,6 +1,6 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.util.Base64UrlCodec;
+import ru.yandex.practicum.util.Base64Codec;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -44,7 +44,7 @@ public class HmacSignatureService implements SignatureService {
     @Override
     public String sign(String message) {
         byte[] signatureBytes = signBytes(message);
-        return Base64UrlCodec.encode(signatureBytes);
+        return Base64Codec.encodeBase64Url(signatureBytes);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class HmacSignatureService implements SignatureService {
         byte[] providedSignatureBytes;
 
         try {
-            providedSignatureBytes = Base64UrlCodec.decode(signature);
+            providedSignatureBytes = Base64Codec.decodeBase64Url(signature);
         } catch (IllegalArgumentException exception) {
             return false;
         }

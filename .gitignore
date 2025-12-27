@@ -27,3 +27,6 @@ replay_pid*
 out
 *.iml
 /.idea/
+
+# config with secterts
+config.json

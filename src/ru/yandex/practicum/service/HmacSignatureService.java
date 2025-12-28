@@ -1,6 +1,7 @@
 package ru.yandex.practicum.service;
 
 import ru.yandex.practicum.util.Base64Codec;
+import ru.yandex.practicum.exceptions.InvalidSignatureFormatException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -55,7 +56,7 @@ public class HmacSignatureService implements SignatureService {
         try {
             providedSignatureBytes = Base64Codec.decodeBase64Url(signature);
         } catch (IllegalArgumentException exception) {
-            return false;
+            throw new InvalidSignatureFormatException("invalid signature format", exception);
         }
 
         return MessageDigest.isEqual(expectedSignatureBytes, providedSignatureBytes);

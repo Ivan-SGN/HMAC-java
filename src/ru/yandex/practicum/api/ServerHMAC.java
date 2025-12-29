@@ -15,25 +15,20 @@ import java.net.InetSocketAddress;
 import java.nio.file.Path;
 
 public class ServerHMAC {
-
-    private final AppConfig config;
-    private final Gson gson;
-    private final SignatureService signatureService;
+    private final Path CONFIG_PATH = Path.of("config.json");
     private final HttpServer httpServer;
 
     public ServerHMAC() throws IOException {
-        this.gson = GsonConfig.createGson();
+        Gson gson = GsonConfig.createGson();
         ConfigLoader configLoader = new ConfigLoader(gson);
-        this.config = configLoader.load(Path.of("config.json"));
-
-        this.signatureService = new HmacSignatureService(
+        AppConfig config = configLoader.load(CONFIG_PATH);
+        SignatureService signatureService = new HmacSignatureService(
                 config.getHmacAlg(),
                 config.getSecretKey()
         );
-
         this.httpServer = HttpServer.create(new InetSocketAddress(config.getListenPort()), 0);
-        httpServer.createContext("/sign", new SignatureHandler(signatureService, gson));
-        httpServer.createContext("/verify", new VerifyHandler(signatureService, gson));
+        httpServer.createContext("/sign", new SignatureHandler(signatureService, gson, config));
+        httpServer.createContext("/verify", new VerifyHandler(signatureService, gson, config));
     }
 
     public void start() {

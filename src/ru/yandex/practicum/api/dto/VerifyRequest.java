@@ -1,3 +1,15 @@
 package ru.yandex.practicum.api.dto;
 
-public record VerifyRequest(String msg, String signature) { }
+public class VerifyRequest {
+
+    private String msg;
+    private String signature;
+
+    public String msg() {
+        return msg;
+    }
+
+    public String signature() {
+        return signature;
+    }
+}

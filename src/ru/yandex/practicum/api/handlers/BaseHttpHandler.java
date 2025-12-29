@@ -18,7 +18,6 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
-    private static final String HEADER_CONTENT_LENGTH = "Content-Length";
     private static final String APPLICATION_JSON = "application/json";
     private static final String RESPONSE_CONTENT_TYPE_JSON_UTF8 = "application/json; charset=utf-8";
 
@@ -78,6 +77,9 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     protected <T> T parseJson(String body, Class<T> targetClass) {
+        if (body == null || body.isBlank()) {
+            throw new InvalidJsonException();
+        }
         try {
             return gson.fromJson(body, targetClass);
         } catch (JsonParseException exception) {
@@ -99,13 +101,14 @@ public abstract class BaseHttpHandler implements HttpHandler {
         sendJson(exchange, statusCode, new ErrorResponse(errorCode));
     }
 
-    protected void sendInvalidJson(HttpExchange exchange) throws IOException {
-        sendError(exchange, 400, "invalid_json");
-    }
-
     protected void sendInternal(HttpExchange exchange) throws IOException {
         sendError(exchange, 500, "internal");
     }
+
+    protected void sendInvalidSignatureFormatException(HttpExchange exchange) throws IOException {
+        sendError(exchange, 400, "invalid_signature_format");
+    }
+
 
     private record ErrorResponse(String error) { }
 }

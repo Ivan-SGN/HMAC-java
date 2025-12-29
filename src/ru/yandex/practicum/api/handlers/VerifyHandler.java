@@ -7,6 +7,7 @@ import ru.yandex.practicum.api.dto.VerifyResponse;
 import ru.yandex.practicum.config.AppConfig;
 import ru.yandex.practicum.exceptions.ApiRequestException;
 import ru.yandex.practicum.exceptions.InvalidMsgException;
+import ru.yandex.practicum.exceptions.InvalidSignatureFormatException;
 import ru.yandex.practicum.service.SignatureService;
 import ru.yandex.practicum.util.Base64Codec;
 
@@ -22,6 +23,8 @@ public class VerifyHandler extends BaseHttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         try {
             handleVerify(exchange);
+        } catch (InvalidSignatureFormatException exception) {
+            sendInvalidSignatureFormatException(exchange);
         } catch (ApiRequestException exception) {
             sendError(exchange, exception.getStatusCode(), exception.getErrorCode());
         } catch (Exception exception) {
@@ -37,7 +40,6 @@ public class VerifyHandler extends BaseHttpHandler {
         if (request.signature() == null || request.signature().isBlank()) {
             throw new InvalidMsgException();
         }
-        Base64Codec.decodeBase64Url(request.signature());
         boolean ok = signatureService.verify(request.msg(), request.signature());
         sendSuccess(exchange, new VerifyResponse(ok));
     }

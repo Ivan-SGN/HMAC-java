@@ -7,6 +7,7 @@ import ru.yandex.practicum.api.dto.SignResponse;
 import ru.yandex.practicum.config.AppConfig;
 import ru.yandex.practicum.exceptions.ApiRequestException;
 import ru.yandex.practicum.exceptions.InvalidMsgException;
+import ru.yandex.practicum.exceptions.InvalidSignatureFormatException;
 import ru.yandex.practicum.service.SignatureService;
 
 import java.io.IOException;
@@ -21,6 +22,8 @@ public class SignatureHandler extends BaseHttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         try {
             handleSign(exchange);
+        } catch (InvalidSignatureFormatException exception) {
+            sendInvalidSignatureFormatException(exchange);
         } catch (ApiRequestException exception) {
             sendError(exchange, exception.getStatusCode(), exception.getErrorCode());
         } catch (Exception exception) {

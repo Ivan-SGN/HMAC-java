@@ -30,3 +30,6 @@ out
 
 # config with secterts
 config.json
+
+# logging
+logs/

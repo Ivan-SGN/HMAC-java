@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.practicum.api.dto.ApiErrorCodes;
 import ru.yandex.practicum.api.dto.ErrorResponse;
+import ru.yandex.practicum.api.logging.AppLogger;
 import ru.yandex.practicum.config.AppConfig;
 import ru.yandex.practicum.exceptions.InvalidJsonException;
 import ru.yandex.practicum.exceptions.InvalidMsgException;
@@ -29,12 +30,14 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     protected final SignatureService signatureService;
     protected final Gson gson;
+    protected final AppLogger log;
     protected final int maxBodySizeBytes;
 
     protected BaseHttpHandler(SignatureService signatureService, Gson gson, AppConfig appConfig) {
         this.signatureService = signatureService;
         this.gson = gson;
         this.maxBodySizeBytes = appConfig.getMaxMsgSizeBytes();
+        this.log = AppLogger.forClass(getClass());
     }
 
     protected String readRequestBody(HttpExchange exchange) throws IOException {
@@ -110,10 +113,12 @@ public abstract class BaseHttpHandler implements HttpHandler {
 
     protected void sendSuccess(HttpExchange exchange, Object body) throws IOException {
         sendJson(exchange, 200, body);
+        log.logResponse(exchange, 200);
     }
 
     protected void sendError(HttpExchange exchange, int statusCode, String errorCode) throws IOException {
         sendJson(exchange, statusCode, new ErrorResponse(errorCode));
+        log.logError(exchange, statusCode, errorCode);
     }
 
     protected void sendInternal(HttpExchange exchange) throws IOException {

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigLoader {
 
@@ -20,6 +22,8 @@ public class ConfigLoader {
     }
 
     private final Gson gson;
+    private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
+
 
     public ConfigLoader(Gson gson) {
         this.gson = gson;
@@ -27,18 +31,24 @@ public class ConfigLoader {
 
     public AppConfig load(Path configPath) {
         try {
+            log.info("loading config from {}", configPath.toAbsolutePath());
             String json = Files.readString(configPath, StandardCharsets.UTF_8);
             RawConfig rawConfig = gson.fromJson(json, RawConfig.class);
             validate(rawConfig);
-
             byte[] secretKey = decodeSecretKey(rawConfig.secret);
 
-            return new AppConfig(
+            AppConfig config = new AppConfig(
                     rawConfig.hmacAlg,
                     secretKey,
                     rawConfig.listenPort,
                     rawConfig.maxMsgSizeBytes
             );
+            log.info( "config loaded: hmacAlg={}, listenPort={}, maxMsgSizeBytes={}",
+                    config.getHmacAlg(),
+                    config.getListenPort(),
+                    config.getMaxMsgSizeBytes()
+            );
+            return config;
         } catch (JsonParseException exception) {
             throw new ConfigException("invalid json", exception);
         } catch (IOException exception) {

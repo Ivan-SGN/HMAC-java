@@ -36,6 +36,7 @@ public class SignatureHandler extends BaseHttpHandler {
         String body = readRequestBody(exchange);
         SignRequest request = parseJson(body, SignRequest.class);
         validateRequireRequestNotBlank(request.msg());
+        validateFieldSize(request.msg());
         String signature = signatureService.sign(request.msg());
         sendSuccess(exchange, new SignResponse(signature));
     }

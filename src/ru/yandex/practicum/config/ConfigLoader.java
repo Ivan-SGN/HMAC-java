@@ -30,7 +30,7 @@ public class ConfigLoader {
             String json = Files.readString(configPath, StandardCharsets.UTF_8);
             RawConfig rawConfig = gson.fromJson(json, RawConfig.class);
             validate(rawConfig);
-            byte[] secretKey = Base64Codec.decodeBase64(rawConfig.secret);
+            byte[] secretKey = checkSecretCodec(rawConfig.secret);
             return new AppConfig(
                     rawConfig.hmacAlg,
                     secretKey,
@@ -51,6 +51,13 @@ public class ConfigLoader {
         }
         if (rawConfig.secret == null || rawConfig.secret.isBlank()) {
             throw new ConfigException("secret is blank");
+        }
+    }
+    private byte[] checkSecretCodec(String secretKey){
+        try {
+            return Base64Codec.decodeBase64(secretKey);
+        } catch (IllegalArgumentException exception) {
+            throw new ConfigException("secret is not valid base64", exception);
         }
     }
 }

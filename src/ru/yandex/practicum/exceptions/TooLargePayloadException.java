@@ -1,8 +1,10 @@
 package ru.yandex.practicum.exceptions;
 
+import ru.yandex.practicum.api.dto.ApiErrorCodes;
+
 public class TooLargePayloadException extends ApiRequestException {
 
-    public TooLargePayloadException(int maxSizeBytes) {
-        super(413, "payload_too_large", "payload exceeds max size: " + maxSizeBytes);
+    public TooLargePayloadException() {
+        super(413, ApiErrorCodes.PAYLOAD_TOO_LARGE);
     }
 }

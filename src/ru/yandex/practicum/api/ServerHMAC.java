@@ -46,7 +46,7 @@ public class ServerHMAC {
         try {
             ServerHMAC serverHMAC = new ServerHMAC();
             serverHMAC.start();
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             System.out.println("failed to start http server: " + exception.getMessage());
         }
     }

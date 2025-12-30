@@ -37,6 +37,7 @@ public class VerifyHandler extends BaseHttpHandler {
         String body = readRequestBody(exchange);
         VerifyRequest request = parseJson(body, VerifyRequest.class);
         validateRequireRequestNotBlank(request.msg());
+        validateFieldSize(request.msg());
         if (request.signature() == null || request.signature().isBlank()) {
             throw new InvalidMsgException();
         }

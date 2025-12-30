@@ -16,20 +16,20 @@ class ConfigLoaderTest {
 
     @TempDir
     Path tempDir;
-
     private final Gson gson = new Gson();
     private final ConfigLoader loader = new ConfigLoader(gson);
-
-    @Test
-    void testLoadsValidConfig() throws IOException {
-        Path configPath = writeConfig("""
+    private final String CONFIG_CONTENT = """
                 {
                   "hmacAlg": "HmacSHA256",
                   "secret": "c2VjcmV0LWtleS0xMjM0",
                   "listenPort": 8080,
                   "maxMsgSizeBytes": 1048576
                 }
-                """);
+                """;
+
+    @Test
+    void testLoadsValidConfig() throws IOException {
+        Path configPath = writeConfig(CONFIG_CONTENT);
 
         AppConfig config = loader.load(configPath);
 
@@ -85,6 +85,22 @@ class ConfigLoaderTest {
                 "null json should cause config loader to throw config exception");
 
         assertEquals("config is empty", exception.getMessage(), "null json should be treated as empty config");
+    }
+
+    @Test
+    void testThrowsSecretIsNotValidBase64() throws IOException {
+        Path configPath = writeConfig("""
+            {
+                "hmacAlg": "HmacSHA256",
+                "secret": "@@@",
+                "listenPort": 8080,
+                "maxMsgSizeBytes": 1048576
+            }
+            """);
+        ConfigException exception = assertThrows(ConfigException.class, () -> loader.load(configPath),
+                "secret is not valid base64");
+        assertEquals("secret is not valid base64", exception.getMessage(),
+                "secret is not valid base64");
     }
 
     private Path writeConfig(String content) throws IOException {

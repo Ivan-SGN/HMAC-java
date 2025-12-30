@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ru.yandex.practicum.api.dto.ApiErrorCodes;
+import ru.yandex.practicum.api.dto.ErrorResponse;
 import ru.yandex.practicum.config.AppConfig;
 import ru.yandex.practicum.exceptions.*;
 import ru.yandex.practicum.service.SignatureService;
@@ -40,7 +42,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
         try (InputStream source = inputStream) {
             byte[] bodyBytes = source.readNBytes(limitBytes + 1);
             if (bodyBytes.length > limitBytes) {
-                throw new TooLargePayloadException(limitBytes);
+                throw new TooLargePayloadException();
             }
             return bodyBytes;
         }
@@ -93,6 +95,15 @@ public abstract class BaseHttpHandler implements HttpHandler {
         }
     }
 
+    protected void validateFieldSize(String value) {
+         if (value == null) {
+             return;
+         }
+         if (value.getBytes(CHARSET).length > maxBodySizeBytes) {
+             throw new TooLargePayloadException();
+         }
+     }
+
     protected void sendSuccess(HttpExchange exchange, Object body) throws IOException {
         sendJson(exchange, 200, body);
     }
@@ -102,13 +113,10 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     protected void sendInternal(HttpExchange exchange) throws IOException {
-        sendError(exchange, 500, "internal");
+        sendError(exchange, 500, ApiErrorCodes.INTERNAL);
     }
 
     protected void sendInvalidSignatureFormatException(HttpExchange exchange) throws IOException {
-        sendError(exchange, 400, "invalid_signature_format");
+        sendError(exchange, 400, ApiErrorCodes.INVALID_SIGNATURE_FORMAT);
     }
-
-
-    private record ErrorResponse(String error) { }
 }

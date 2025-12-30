@@ -7,7 +7,11 @@ import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.practicum.api.dto.ApiErrorCodes;
 import ru.yandex.practicum.api.dto.ErrorResponse;
 import ru.yandex.practicum.config.AppConfig;
-import ru.yandex.practicum.exceptions.*;
+import ru.yandex.practicum.exceptions.InvalidJsonException;
+import ru.yandex.practicum.exceptions.InvalidMsgException;
+import ru.yandex.practicum.exceptions.MethodNotAllowedException;
+import ru.yandex.practicum.exceptions.TooLargePayloadException;
+import ru.yandex.practicum.exceptions.UnsupportedMediaTypeException;
 import ru.yandex.practicum.service.SignatureService;
 
 import java.io.IOException;
@@ -75,7 +79,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
         if (contentType == null) {
             return false;
         }
-        return contentType.toLowerCase().startsWith(APPLICATION_JSON);
+        return contentType.trim().toLowerCase().startsWith(APPLICATION_JSON);
     }
 
     protected <T> T parseJson(String body, Class<T> targetClass) {
@@ -96,13 +100,13 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     protected void validateFieldSize(String value) {
-         if (value == null) {
-             return;
-         }
-         if (value.getBytes(CHARSET).length > maxBodySizeBytes) {
-             throw new TooLargePayloadException();
-         }
-     }
+        if (value == null) {
+            return;
+        }
+        if (value.getBytes(CHARSET).length > maxBodySizeBytes) {
+            throw new TooLargePayloadException();
+        }
+    }
 
     protected void sendSuccess(HttpExchange exchange, Object body) throws IOException {
         sendJson(exchange, 200, body);

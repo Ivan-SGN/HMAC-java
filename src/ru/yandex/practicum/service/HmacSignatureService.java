@@ -44,21 +44,24 @@ public class HmacSignatureService implements SignatureService {
 
     @Override
     public String sign(String message) {
-        byte[] signatureBytes = signBytes(message);
-        return Base64Codec.encodeBase64Url(signatureBytes);
+        try {
+            byte[] signatureBytes = signBytes(message);
+            return Base64Codec.encodeBase64Url(signatureBytes);
+        } catch (IllegalArgumentException exception) {
+            throw new InvalidSignatureFormatException(exception);
+        }
     }
 
     @Override
     public boolean verify(String message, String signature) {
-        byte[] expectedSignatureBytes = signBytes(message);
         byte[] providedSignatureBytes;
-
+        byte[] expectedSignatureBytes;
         try {
             providedSignatureBytes = Base64Codec.decodeBase64Url(signature);
+            expectedSignatureBytes = signBytes(message);
         } catch (IllegalArgumentException exception) {
-            throw new InvalidSignatureFormatException("invalid signature format", exception);
+            throw new InvalidSignatureFormatException(exception);
         }
-
         return MessageDigest.isEqual(expectedSignatureBytes, providedSignatureBytes);
     }
 }

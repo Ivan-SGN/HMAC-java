@@ -18,7 +18,10 @@ class ConfigLoaderTest {
     Path tempDir;
     private final Gson gson = new Gson();
     private final ConfigLoader loader = new ConfigLoader(gson);
-    private final String CONFIG_CONTENT = """
+
+    @Test
+    void testLoadsValidConfig() throws IOException {
+        String CONFIG_CONTENT = """
                 {
                   "hmacAlg": "HmacSHA256",
                   "secret": "c2VjcmV0LWtleS0xMjM0",
@@ -26,9 +29,6 @@ class ConfigLoaderTest {
                   "maxMsgSizeBytes": 1048576
                 }
                 """;
-
-    @Test
-    void testLoadsValidConfig() throws IOException {
         Path configPath = writeConfig(CONFIG_CONTENT);
 
         AppConfig config = loader.load(configPath);

@@ -10,12 +10,6 @@ public abstract class ApiRequestException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
-    protected ApiRequestException(int statusCode, String errorCode, Throwable cause) {
-        super(cause);
-        this.statusCode = statusCode;
-        this.errorCode = errorCode;
-    }
-
     public int getStatusCode() {
         return statusCode;
     }

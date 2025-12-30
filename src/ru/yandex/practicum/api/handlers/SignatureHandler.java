@@ -6,7 +6,6 @@ import ru.yandex.practicum.api.dto.SignRequest;
 import ru.yandex.practicum.api.dto.SignResponse;
 import ru.yandex.practicum.config.AppConfig;
 import ru.yandex.practicum.exceptions.ApiRequestException;
-import ru.yandex.practicum.exceptions.InvalidMsgException;
 import ru.yandex.practicum.exceptions.InvalidSignatureFormatException;
 import ru.yandex.practicum.service.SignatureService;
 

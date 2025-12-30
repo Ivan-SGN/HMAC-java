@@ -9,7 +9,6 @@ import ru.yandex.practicum.exceptions.ApiRequestException;
 import ru.yandex.practicum.exceptions.InvalidMsgException;
 import ru.yandex.practicum.exceptions.InvalidSignatureFormatException;
 import ru.yandex.practicum.service.SignatureService;
-import ru.yandex.practicum.util.Base64Codec;
 
 import java.io.IOException;
 
